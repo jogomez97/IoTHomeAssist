@@ -65,3 +65,48 @@ void setTemperature(String serial_num, int value) {
     }
   }
 }
+
+void setPresence(String serial_num, String state) {
+  if (firebase_enabled) {
+    String url = "/users/" + serial_num + "/sensor";
+    Firebase.setString(url, state);
+    if (Firebase.failed()) {
+      // Adding } else { error_ = FirebaseError(); } in FirebaseArduino.cpp -> FirebaseCall::analyzeError, reconnects to Firebase
+      Firebase.setString(url, state);
+      if (Firebase.failed()) sendLog("Updating presence failed");
+      else sendLog("Presence updated");
+    } else {
+      sendLog("Presence updated");
+    }
+  }
+}
+
+void setWaterLevel(String serial_num, int percentage) {
+  if (firebase_enabled) {
+    String url = "/users/" + serial_num + "/waterLevel";
+    Firebase.setInt(url, percentage);
+    if (Firebase.failed()) {
+      // Adding } else { error_ = FirebaseError(); } in FirebaseArduino.cpp -> FirebaseCall::analyzeError, reconnects to Firebase
+      Firebase.setInt(url, percentage);
+      if (Firebase.failed()) sendLog("Updating water level failed");
+      else sendLog("Water level updated");
+    } else {
+      sendLog("Water level updated");
+    }
+  }
+}
+
+
+int getWaterLevelFirebase(String serial_num) {
+  if (firebase_enabled) {
+    String url = "/users/" + serial_num + "/waterLevel";
+    int value = Firebase.getInt(url);
+    if (Firebase.failed()) {
+      // Adding } else { error_ = FirebaseError(); } in FirebaseArduino.cpp -> FirebaseCall::analyzeError, reconnects to Firebase
+      value = Firebase.getInt(url);
+      if (Firebase.failed()) return -1;
+      else return value;
+    }
+    return value;
+  }
+}

@@ -10,15 +10,17 @@
 #define SERIAL_NUM    "1111-1111-1111-1112"
 
 // Pins
-#define PIN_SERVO       D1  // PWM pin: [D1..D8]
+#define PIN_SERVO       D1  // PWM pin
+#define PIN_ONE_WIRE    D2
+#define PIN_PRESENCE_H  D7
+#define PIN_PRESENCE_L  D8
 #define PIN_PULS_ALARM  D4  // Pull-up resistor
 #define PIN_PULS_OPEN   D5  // Pull-up resistor
 #define PIN_PULS_CLOSE  D6  // Pull-up resistor
-#define PIN_ONE_WIRE    D2  
 
 // Temperature sensor constant
 #define T_REFRESH_SEC   30
-#define T_MAX           28
+#define T_MAX           29
 
 const int ip[4] = {192, 168, 1, 220};
 const int gateway[4] = {192, 168, 1, 1};
@@ -40,6 +42,7 @@ void setup() {
   addButton(PIN_PULS_ALARM, sendButtonAlarm);
   initFirebase(FIREBASE_HOST, FIREBASE_AUTH, wifi_enabled);
   initTemperature(PIN_ONE_WIRE, T_REFRESH_SEC, T_MAX);
+  initPresence(PIN_PRESENCE_H, PIN_PRESENCE_L);
 
   // Welcome messages
   sendLog("\n\n");
@@ -53,9 +56,11 @@ void setup() {
 }
 
 void loop() {
-  loopMotor();
   loopButtonManager();
+  loopMotor();
+  loopMotorFirebase();
   loopTemperature();
+  loopPresence();
 }
 
 void openValve() {
@@ -75,7 +80,28 @@ void sendButtonAlarm() {
 void updateTemperature(int value, bool sendAlarm, int threshold) {
   setTemperature(SERIAL_NUM, value);
   if (sendAlarm) {
+    sendLog("Temperature is too high");
     sendNotification(SERIAL_NUM, "Alarm", "Temperature is higher than " + String(threshold) + "ºC");
     setValveOrder(3);
   }
+}
+
+void updatePresence(String state, bool sendAlarm) {
+  setPresence(SERIAL_NUM, state);
+  if (sendAlarm) {
+    sendLog("Falling detected!");
+    sendNotification(SERIAL_NUM, "Alarm", "Falling detected");
+    setValveOrder(3);
+  } else {
+    sendLog("Movement sensors detected: " + state);
+  }
+}
+
+// Pos must be between 0 and 10 (0% and 100%)
+void updateWaterLevel(int pos) {
+  setWaterLevel(SERIAL_NUM, pos * 10); // *10 for %
+}
+
+int getWaterLevel() {
+  return getWaterLevelFirebase(SERIAL_NUM) / 10;  // From % to pos
 }
