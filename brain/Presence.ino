@@ -1,3 +1,9 @@
+/**
+   Presence TAD is able to detect fallings by setting up two PIR sensors in a high
+   and low positions.
+   MET06 - Grupo 2
+   @authors - Joan Gomez, Jordi Malé, Toni Chico
+*/
 
 #define PRESENCE_ACK_TIME_MS  3000
 #define NO_MOVE_TIME_MS       20000   // 20 seconds non detecting
@@ -18,6 +24,12 @@ enum PresenceStates {
 int pinH;
 int pinL;
 
+
+/**
+   Init of presence TAD
+   @param pinHigh, pin where the higher sensor is connected
+   @param pinLow, pin where the lower sensor is connected
+*/
 void initPresence(int pinHigh, int pinLow) {
   pinH = pinHigh;
   pinL = pinLow;
@@ -25,6 +37,9 @@ void initPresence(int pinHigh, int pinLow) {
   pinMode(pinL, INPUT);
 }
 
+/**
+   Motor loop for the presence sensor
+*/
 void loopPresence() {
   static int state = PS_WAIT_DETECT;
   static unsigned long startTime = 0;
@@ -44,6 +59,7 @@ void loopPresence() {
         }
       }
       break;
+    // Check if real presence
     case PS_ACK_DETECT:
       currentSensors = getActivationState();
       // Presence detected. Wait in the next state until some sensor changes
@@ -59,6 +75,7 @@ void loopPresence() {
         startTime = millis();
       }
       break;
+    // Wait until one or both sensors stop detecting presence
     case PS_WAIT_LEAVE:
       currentSensors = getActivationState();
       // No signal from both sensors or only signal from high
@@ -73,6 +90,7 @@ void loopPresence() {
         startTime = millis();
       } // else if (currentSensors == 11) {} // Do nothing wait for some sensor signal to change
       break;
+    // Confirm is a falling by checking the persistance of only the low sensor activation
     case PS_POSSIBLE_FALL:
       currentSensors = getActivationState();
       // Fall detected, send alarm
@@ -89,8 +107,8 @@ void loopPresence() {
         startTime = millis();
       }
       break;
+    // Wait until status changes from fall
     case PS_WAIT_FALL:
-      // Wait until status changes from fall
       if (getActivationState() != 1) {
         state = PS_WAIT_DETECT;
         startTime = millis();
@@ -103,6 +121,10 @@ void loopPresence() {
   }
 }
 
+/**
+ * Gets the current state of both the sensors in just 1 line of code.
+ * @return int current status of the sensor.
+ */
 inline int getActivationState() {
   // The high sensor has a value of 10, the low sensor has a value of 1
   // We have four possible values: 0, 1, 10, 11

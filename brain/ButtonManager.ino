@@ -1,3 +1,9 @@
+/**
+ * ButtonManager allows to manage multiple buttons with one single class
+ * MET06 - Grupo 2
+ * @authors - Joan Gomez, Jordi Malé, Toni Chico
+ */
+
 #define MAX_BUTTONS 10
 #define FILTER_MS 150
 
@@ -14,6 +20,9 @@ int buttonStates[MAX_BUTTONS];
 void (*buttonFunction[MAX_BUTTONS])(void);
 unsigned long buttonTimes[MAX_BUTTONS];
 
+/**
+ * Init of ButtonManager
+ */
 void initButtonManager() {
   nButtons = 0;
   for (int i = 0; i < MAX_BUTTONS; i++) {
@@ -23,6 +32,9 @@ void initButtonManager() {
   }
 }
 
+/**
+ * Loop of button manager
+ */
 void loopButtonManager() {
   for (int i = 0; i < nButtons; i++) {
     if (buttonArray[i] > 0) {
@@ -31,6 +43,11 @@ void loopButtonManager() {
   }
 }
 
+/**
+ * Adds a button to the button manager array to be managed.
+ * @param pin, pin where the button is connected
+ * @param func, function to be executed when button is released
+ */
 void addButton(int pin, void (*func)(void)) {
   pinMode(pin, INPUT_PULLUP);
   buttonArray[nButtons] = pin;
@@ -38,6 +55,10 @@ void addButton(int pin, void (*func)(void)) {
   nButtons++;
 }
 
+/**
+ * Loop of an individual button
+ * @param pos, position inside the button manager logic
+ */
 void loopButton(int pos) {
   switch (buttonStates[pos]) {
     // Wait for button to be pressed

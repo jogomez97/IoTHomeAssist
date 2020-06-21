@@ -1,3 +1,9 @@
+/**
+ * Main class of GranWatcher
+ * MET06 - Grupo 2
+ * @authors - Joan Gomez, Jordi Malé, Toni Chico
+ */
+
 #define DEBUG true
 
 // Credentials
@@ -28,6 +34,9 @@ const int subnet[4] = {255, 255, 255, 0};
 
 bool wifi_enabled = false;
 
+/**
+ * Setup with all the necessary inits
+ */
 void setup() {
   // Inits
   //if (initWifiStatic(WIFI_SSID, WIFI_PASSWORD, ip, gateway, subnet) < 0) wifi_enabled = false;
@@ -55,6 +64,9 @@ void setup() {
   }
 }
 
+/**
+ * Loop of the program
+ */
 void loop() {
   loopButtonManager();
   loopMotor();
@@ -63,20 +75,35 @@ void loop() {
   loopPresence();
 }
 
+/**
+ * Sends an order to the motor TAD to open one step
+ */
 void openValve() {
   setValveOrder(1);
 }
 
+/**
+ * Sends an order to the motor TAD to close one step
+ */
 void closeValve() {
   setValveOrder(2);
 }
 
+/**
+ * Sends the alarm corresponding to the pressing of the alarm button
+ */
 void sendButtonAlarm() {
   sendLog("Alarm button pressed!");
   sendNotification(SERIAL_NUM, "Alarm", "Alarm button pressed");
   setValveOrder(3);
 }
 
+/**
+ * Calls the update of the firebase temperature and sends alarm if needed
+ * @param value, value of the new temperature
+ * @param sendAlarm, true if the threshold has been passed and an alarm needs to be sent
+ * @param threshold, max temperature of the system
+ */
 void updateTemperature(int value, bool sendAlarm, int threshold) {
   setTemperature(SERIAL_NUM, value);
   if (sendAlarm) {
@@ -86,6 +113,11 @@ void updateTemperature(int value, bool sendAlarm, int threshold) {
   }
 }
 
+/**
+ * Calls the update of the firebase presence and sends alarm if needed
+ * @param state, sensor status
+ * @param sendAlarm, true if alarm needs to be sent
+ */
 void updatePresence(String state, bool sendAlarm) {
   setPresence(SERIAL_NUM, state);
   if (sendAlarm) {
@@ -97,11 +129,18 @@ void updatePresence(String state, bool sendAlarm) {
   }
 }
 
-// Pos must be between 0 and 10 (0% and 100%)
+/**
+ * Calls the update of the firebase sensor
+ * @param pos, current position of the motor (valve). Must be between 0 and 10 (0% and 100%)
+ */
 void updateWaterLevel(int pos) {
   setWaterLevel(SERIAL_NUM, pos * 10); // *10 for %
 }
 
+/**
+ * Gets the water level from firebase and converts to motor steps
+ * @return int, water level represented in valve steps
+ */
 int getWaterLevel() {
   return getWaterLevelFirebase(SERIAL_NUM) / 10;  // From % to pos
 }

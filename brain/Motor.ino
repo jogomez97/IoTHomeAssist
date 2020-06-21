@@ -1,3 +1,10 @@
+/**
+ * Allows the user to control a motor with valve logic. That includes a control
+ * on opening an closing self awareness state.
+ * MET06 - Grupo 2
+ * @authors - Joan Gomez, Jordi Malé, Toni Chico
+ */
+
 #include <Servo.h>
 
 #define INIT_TIME_MS 4000   // Bigger than rotate time as we don't know the initial position
@@ -41,6 +48,11 @@ int firebaseOpened;
 int maxOpen = 10;
 bool listenFirebase;
 
+
+/**
+ * Init of the motor. Default times to be opened is 10
+ * @param pin, pin where the motor is connected
+ */
 void initMotor(int pin) {
   pinMode(pin, OUTPUT);
   servoMotor.attach(pin);
@@ -49,6 +61,11 @@ void initMotor(int pin) {
   listenFirebase = false;
 }
 
+/**
+ * Init of the motor with a limit of opening to be set.
+ * @param pin, pin where the motor is connected
+ * @param limit, number of times the motor can be opened
+ */
 void initMotor(int pin, int limit) {
   pinMode(pin, OUTPUT);
   servoMotor.attach(pin);
@@ -58,6 +75,9 @@ void initMotor(int pin, int limit) {
   maxOpen = limit;
 }
 
+/**
+ * Loop of the motor to be opened or closed depending on different orders.
+ */
 void loopMotor() {
   static int state = MS_INIT_GO;
   static unsigned long startTime = 0;
@@ -176,6 +196,9 @@ void loopMotor() {
   }
 }
 
+/**
+ * Loop of the motor that checks with Firebase if water level value has been updated
+ */
 void loopMotorFirebase() {
   static int stateFB = MFS_WAIT;
   static unsigned long startTimeFB = millis();
@@ -203,6 +226,10 @@ void loopMotorFirebase() {
   }
 }
 
+/**
+ * Interface for other TADs to set and order to the motor
+ * @param order, must be one of ORDER_* declared
+ */
 void setValveOrder(int order) {
   servoOrder = order;
 }

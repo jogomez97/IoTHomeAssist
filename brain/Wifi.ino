@@ -1,12 +1,31 @@
+/**
+ * Allows the user to stablish a connection via WiFi with both a dynamic or static IP.
+ * MET06 - Grupo 2
+ * @authors - Joan Gomez, Jordi Malé, Toni Chico
+ */
+
 #include <ESP8266WiFi.h>
 
 #define WAIT_TIME_MS 10000
 
+/**
+ * Init the Wifi module with dynamic IP
+ * @param ssid_name, ssid of the network to connect
+ * @param password, password of the network to connect
+ */
 int initWifi(String ssid_name, String password) {
   WiFi.begin(ssid_name.c_str(), password.c_str());
   return waitForConnection();
 }
 
+/**
+ * Init the Wifi module with static IP
+ * @param ssid_name, ssid of the network to connect
+ * @param password, password of the network to connect
+ * @param ip, static IP to be assigned
+ * @param gateway, router gateway IP of the network
+ * @param subnet, subnet mask of the network
+ */
 int initWifiStatic(String ssid_name, String password, const int ip[], const int gateway[], const int subnet[]) {
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid_name.c_str(), password.c_str());
@@ -18,6 +37,10 @@ int initWifiStatic(String ssid_name, String password, const int ip[], const int 
   return waitForConnection();
 }
 
+/**
+ * Waits until the WiFi is configured correctly or a time threshold is passed
+ * @return int, 0 if the connection was successfull, -1 otherwise
+ */
 int waitForConnection() {
   unsigned long startTime = millis();
   while (WiFi.status() != WL_CONNECTED && millis() - startTime < WAIT_TIME_MS) {
@@ -32,6 +55,10 @@ int waitForConnection() {
   return -1;
 }
 
+/**
+ * Gets the configured IP in the network
+ * @return String, IP cofigured
+ */
 String getIP() {
   return WiFi.localIP().toString();
 }

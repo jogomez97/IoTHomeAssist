@@ -1,3 +1,11 @@
+/**
+ * Debuggler class allows to send log message for debugging through serial monitor,
+ * TCP connection on port 23 or both. Can be disabled with a master enable.
+ * MET06 - Grupo 2
+ * @authors - Joan Gomez, Jordi Malé, Toni Chico
+ */
+
+
 #include <ESP8266WiFi.h>
 
 #define DEBUGGER_CL   1 // Debug via command line
@@ -10,6 +18,12 @@ int debugger_mode = DEBUGGER_CL;
 WiFiServer wifiServer(23);
 WiFiClient wifiClient;
 
+/**
+ * Init of the debugger
+ * @param enabled, master enable of all the TAD. If false no messages will be sent despite the interface.
+ * @param interface, interface from which we will communicate. Must be one of DEBUGGER_* values. 
+ *        With DEBUGGER_ALL the TAD will send logs to both channels
+ */
 void initDebugger(bool enabled, int interface) {
   if (interface != DEBUGGER_TCP && interface != DEBUGGER_CL && interface != DEBUGGER_ALL) {
     debugger_enabled = false;
@@ -25,7 +39,10 @@ void initDebugger(bool enabled, int interface) {
   }
 }
 
-
+/**
+ * Send a log to the specified interface(s) if enabled.
+ * @param l, String log to be sent
+ */
 void sendLog(String l) {
   if (debugger_enabled) {
     if (debugger_mode == DEBUGGER_CL || debugger_mode == DEBUGGER_ALL) {
@@ -38,6 +55,9 @@ void sendLog(String l) {
   }
 }
 
+/**
+ * Check if a client is available or connected to be able to send the logs
+ */
 void setUpClientConnection() {
   if (wifiServer.hasClient()) {
     if (!wifiClient || !wifiClient.connected()) {

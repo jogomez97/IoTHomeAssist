@@ -1,3 +1,10 @@
+/**
+ * Class that connects to Firebase and allows to read and write values from a specific
+ * user. It's also able to send push notifications through cloud messaging
+ * MET06 - Grupo 2
+ * @authors - Joan Gomez, Jordi Malé, Toni Chico
+ */
+
 #include <FirebaseArduino.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
@@ -10,6 +17,12 @@ String firebase_auth;
 
 HTTPClient http;
 
+/**
+ * Inits Firebase module to be used later
+ * @param host, firebase host key
+ * @param auth, firebase authentication key
+ * @param enable, enables or disables firebase communication. Usefull when no WiFi connection could be made
+ */
 void initFirebase(String host, String auth, bool enable) {
   firebase_enabled = enable;
   if (firebase_enabled) {
@@ -19,6 +32,12 @@ void initFirebase(String host, String auth, bool enable) {
   }
 }
 
+/**
+ * Generic method for sending notifications to a specific username recognized by its serial_number
+ * @param serial_num, serial number of the user to send the notification
+ * @param title, title of the notification
+ * @param body, body of the notification
+ */
 void sendNotification(String serial_num, String title, String body) {
   if (firebase_enabled) {
     // Get notification id
@@ -51,6 +70,11 @@ void sendNotification(String serial_num, String title, String body) {
   }
 }
 
+/**
+ * Sets the temperature of a user
+ * @param serial_num, serial number of the user
+ * @param value, new temperature to be set
+ */
 void setTemperature(String serial_num, int value) {
   if (firebase_enabled) {
     String url = "/users/" + serial_num + "/temperature";
@@ -66,6 +90,12 @@ void setTemperature(String serial_num, int value) {
   }
 }
 
+
+/**
+ * Sets the presence of a user
+ * @param serial_num, serial number of the user
+ * @param value, new presence to be set
+ */
 void setPresence(String serial_num, String state) {
   if (firebase_enabled) {
     String url = "/users/" + serial_num + "/sensor";
@@ -81,6 +111,11 @@ void setPresence(String serial_num, String state) {
   }
 }
 
+/**
+ * Sets the water level of a user
+ * @param serial_num, serial number of the user
+ * @param value, new water level to be set
+ */
 void setWaterLevel(String serial_num, int percentage) {
   if (firebase_enabled) {
     String url = "/users/" + serial_num + "/waterLevel";
@@ -96,7 +131,11 @@ void setWaterLevel(String serial_num, int percentage) {
   }
 }
 
-
+/**
+ * Gets the current water level of a user
+ * @param serial_num, serial number of the user
+ * @return int, value of the water level
+ */
 int getWaterLevelFirebase(String serial_num) {
   if (firebase_enabled) {
     String url = "/users/" + serial_num + "/waterLevel";
